@@ -70,9 +70,16 @@ int main() {
         std::cout << "Error with vertex shader comp:" << std::endl << infoLog << std::endl;
     }
     
+    // create program
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+
+
+
     // compile fragement shade
     unsigned int fragmentShader;
-
+    
 
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
