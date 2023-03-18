@@ -69,17 +69,55 @@ int main() {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
         std::cout << "Error with vertex shader comp:" << std::endl << infoLog << std::endl;
     }
-    
-    // create program
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-
-
 
     // compile fragement shade
     unsigned int fragmentShader;
-    
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    std::string fragShaderSrc = loadShaderSrc("assets/frament_shader.glsl");
+    const GLchar* fragShader = fragShaderSrc.c_str();
+    glShaderSource(fragmentShader, 1, &fragShader, NULL);
+    glCompileShader(fragmentShader);
+
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cout << "Error with fragment shader comp:" << std::endl << infoLog << std::endl;
+    }
+
+    /*
+    * create program
+    * Vertex Array Object (VAO, wrapper of vertex data, points to various data)
+    * Vertex buffer object
+    */ 
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cout << "Linking Error: " << std::endl << infoLog << std::endl;
+    }
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    float vertices[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f
+    };
+    unsigned int VAO, VBO;
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
